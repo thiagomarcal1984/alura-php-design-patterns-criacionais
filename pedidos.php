@@ -1,18 +1,20 @@
 <?php
 
-use Alura\DesignPattern\TemplatePedido;
 use Alura\DesignPattern\Orcamento;
-use Alura\DesignPattern\Pedido;
+use Alura\DesignPattern\Pedido\CriadorDePedido;
 
 require 'vendor/autoload.php';
 
 $pedidos = [];
-$dados = new TemplatePedido(md5('a'), new \DateTimeImmutable());
+$criadorDePedido = new CriadorDePedido();
 
 for ($i = 0; $i < 10000; $i++) {
-    $pedido = new Pedido();
-    $pedido->dados = $dados;
-    $pedido->orcamento = new Orcamento();
+    $orcamento = new Orcamento();
+    $pedido = $criadorDePedido->criaPedido(
+        'a',
+        date('Y-m-d'),
+        $orcamento
+    );
 
     $pedidos[] = $pedido;
 }
