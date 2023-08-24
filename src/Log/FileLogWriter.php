@@ -4,7 +4,7 @@ namespace Alura\DesignPattern\Log;
 
 class FileLogWriter implements LogWriter
 {
-    private string $arquivo;
+    private $arquivo;
 
     public function __construct(string $caminhoArquivo)
     {
@@ -13,7 +13,7 @@ class FileLogWriter implements LogWriter
     
     public function escreve(string $mensagemFormatada) : void
     {
-        echo $mensagemFormatada;
+        fwrite($this->arquivo, $mensagemFormatada . PHP_EOL);
     }
 
     public function __destruct()

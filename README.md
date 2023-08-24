@@ -138,7 +138,7 @@ namespace Alura\DesignPattern\Log;
 
 class FileLogWriter implements LogWriter
 {
-    private string $arquivo;
+    private $arquivo;
 
     public function __construct(string $caminhoArquivo)
     {
@@ -147,7 +147,7 @@ class FileLogWriter implements LogWriter
     
     public function escreve(string $mensagemFormatada) : void
     {
-        echo $mensagemFormatada;
+        fwrite($this->arquivo, $mensagemFormatada . PHP_EOL);
     }
 
     public function __destruct()
@@ -189,3 +189,56 @@ abstract class LogManager
 }
 ```
 Ainda faltam as classes concretas. Na próxima aula elas serão criadas.
+
+## Factory Method
+Desenvolvimento das classes concretas de fabricação (classe `FileLogManager`):
+```php
+<?php
+
+namespace Alura\DesignPattern\Log;
+
+class FileLogManager extends LogManager
+{
+    private string $caminhoArquivo;
+
+    public function __construct(string $caminhoArquivo)
+    {
+        $this->caminhoArquivo = $caminhoArquivo;
+    }
+
+    public function criarLogWriter() : LogWriter
+    {
+        return new FileLogWriter($this->caminhoArquivo);
+    }
+}
+```
+Classe `StdOutLogManager`: 
+```php
+<?php
+
+namespace Alura\DesignPattern\Log;
+
+class StdOutLogManager extends LogManager
+{
+    public function criarLogWriter() : LogWriter
+    {
+        return new StdOutLogWriter();
+    }
+}
+```
+Arquivo de teste `log.php`:
+```php
+<?php
+
+use Alura\DesignPattern\Log\{StdOutLogManager, FileLogManager};
+
+require 'vendor/autoload.php';
+
+$logManager = new StdOutLogManager();
+$logManager->log('INFO', 'Escrito na tela.');
+
+$logManager = new FileLogManager(__DIR__ . '/log');
+$logManager->log('INFO', 'Escrito em arquivo.');
+```
+
+> Note que o método de fabricação `criarLogWriter` é reescrito, enquanto a lógica do método `log` permanece a mesma.
