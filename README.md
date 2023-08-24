@@ -99,3 +99,61 @@ echo memory_get_peak_usage();
 ```
 
 Leitura complementar sobre o padrão Flyweight: https://refactoring.guru/design-patterns/flyweight
+
+# Fabricando diferentes objetos
+
+## Gerando log de ações
+Criaremos uma interface para qualquer tipo de loggers chamada `LogWriter`:
+
+```php
+<?php
+
+namespace Alura\DesignPattern\Log;
+
+interface LogWriter
+{
+    public function escreve(string $mensagemFormatada) : void;
+}
+```
+
+E também mais duas implementações (uma para log em tela e outra para log em arquivo):
+```php
+<?php
+
+namespace Alura\DesignPattern\Log;
+
+class StdOutLogWriter implements LogWriter
+{
+    public function escreve(string $mensagemFormatada) : void
+    {
+        echo $mensagemFormatada;
+    }
+}
+```
+
+```php
+<?php
+
+namespace Alura\DesignPattern\Log;
+
+class FileLogWriter implements LogWriter
+{
+    private string $arquivo;
+
+    public function __construct(string $caminhoArquivo)
+    {
+        $this->arquivo = fopen($caminhoArquivo, 'a+');
+    }
+    
+    public function escreve(string $mensagemFormatada) : void
+    {
+        echo $mensagemFormatada;
+    }
+
+    public function __destruct()
+    {
+        fclose($this->arquivo);
+    }
+}
+```
+Na próxima aula será implementado o gerenciador de loggers.
