@@ -157,3 +157,35 @@ class FileLogWriter implements LogWriter
 }
 ```
 Na próxima aula será implementado o gerenciador de loggers.
+
+## Executando a ação de log
+Problema: como dispensar a adaptação do código para escolher qual logger usar? Note que cada construtor tem número de parâmetros diferentes:
+
+```php
+//  return new StdOutLogWriter();
+//  return new FileLogWriter('caminho');
+```
+
+A solução é abstrair a fabricação para um método abstrato (classe abstrata `LogManager`):
+
+```php
+<?php
+
+namespace Alura\DesignPattern\Log;
+
+abstract class LogManager
+{
+    public function log(string $severidade, string $mensagemFormatada) : void
+    {
+        $logWriter = $this->criarLogWriter();
+
+        $dataHoje = date('d/m/Y');
+        $mensagemFormatada = "[$dataHoje][$severidade]: $mensagemFormatada";
+
+        $logWriter->escreve($mensagemFormatada);
+    }
+
+    abstract public function criarLogWriter() : LogWriter;
+}
+```
+Ainda faltam as classes concretas. Na próxima aula elas serão criadas.
