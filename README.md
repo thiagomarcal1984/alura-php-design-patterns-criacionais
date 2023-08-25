@@ -2,7 +2,7 @@
 
 - [ ] Abstract Factory
 - [ ] Builder
-- [ ] Factory Method
+- [x] Factory Method
 - [x] Flyweight (?Ele é estrutural, mas controla a criação de flyweights também.)
 - [ ] Prototype
 - [ ] Singleton
@@ -242,3 +242,10 @@ $logManager->log('INFO', 'Escrito em arquivo.');
 ```
 
 > Note que o método de fabricação `criarLogWriter` é reescrito, enquanto a lógica do método `log` permanece a mesma.
+
+## Falando sobre o padrão
+O padrão Factory Method é uma especialização do padrão Template Method: apenas a criação do objeto (Factory Method) varia, mas o template (uso do objeto criado, na forma da superclasse) é o mesmo.
+
+Leitura complementar sobre o padrão Factory Method: 
+- https://refactoring.guru/design-patterns/factory-method
+- https://refactoring.guru/design-patterns/factory-comparison
