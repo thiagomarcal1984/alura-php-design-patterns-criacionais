@@ -249,3 +249,61 @@ O padrão Factory Method é uma especialização do padrão Template Method: ape
 Leitura complementar sobre o padrão Factory Method: 
 - https://refactoring.guru/design-patterns/factory-method
 - https://refactoring.guru/design-patterns/factory-comparison
+
+# Fabricando objetos relacionados
+## Gerando venda
+Queremos fazer com que vendas de serviços calcule o ISS, e que a venda de produtos calcule ICMS.
+
+Classe abstrata `Venda`:
+```php
+<?php
+
+namespace Alura\DesignPattern\Venda;
+
+abstract class Venda
+{
+    public \DateTimeInterface $dataRealizacao;
+
+    public function __construct(\DateTimeInterface $dataRealizacao)
+    {
+        $this->dataRealizacao = $dataRealizacao;
+    }
+}
+```
+Classe concreta `VendaServico`:
+```php
+<?php
+
+namespace Alura\DesignPattern\Venda;
+
+class VendaServico extends Venda
+{
+    private string $nomePrestador;
+
+    public function __construct(\DateTimeInterface $dataRealizacao, string $nomePrestador)
+    {
+        parent::__construct($dataRealizacao);
+        $this->nomePrestador = $nomePrestador;
+    }
+}
+```
+Classe concreta `VendaProduto`:
+```php
+<?php
+
+namespace Alura\DesignPattern\Venda;
+
+class VendaProduto extends Venda
+{
+    /**
+     * @var int Peso do produto em gramas.
+     */
+    private int $pesoProduto;
+
+    public function __construct(\DateTimeInterface $dataRealizacao, int $pesoProduto)
+    {
+        parent::__construct($dataRealizacao);
+        $this->pesoProduto = $pesoProduto;
+    }
+}
+```
