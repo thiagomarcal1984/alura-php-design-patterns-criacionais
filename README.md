@@ -1,6 +1,6 @@
 # Padrões criacionais (Gang of Four)
 
-- [ ] Abstract Factory
+- [x] Abstract Factory
 - [ ] Builder
 - [x] Factory Method
 - [x] Flyweight (?Ele é estrutural, mas controla a criação de flyweights também.)
@@ -396,3 +396,45 @@ var_dump($venda, $imposto);
 O exemplo das duas fábricas implementadas a partir da interface `VendaFactory` foca dois métodos: criar uma venda e um imposto. A classe usuário não precisa saber se a venda/imposto são de produto ou de serviço: só precisa usar o produto da fábrica abstrata para criar uma venda e um imposto de acordo com o seu tipo.
 
 Leitura complementar sobre o padrão Abstract Factory: https://refactoring.guru/design-patterns/abstract-factory
+
+# Expressividade pelo Builder
+## Criando a classe de nota fiscal
+Implementação inicial da classe `NotaFiscal`:
+```php
+<?php
+
+namespace Alura\DesignPattern\NotaFiscal;
+
+class NotaFiscal
+{
+    public string $cnpj;
+    public string $razaoSocial;
+    public array $itens;
+    public string $observacoes;
+    public \DateTimeInterface $dataEmissao;
+    public float $valorImpostos;
+
+    public function __construct(
+        string $cnpj,
+        string $razaoSocial,
+        array $itens,
+        string $observacoes,
+        \DateTimeInterface $dataEmissao,
+        float $valorImpostos,
+    )
+    {
+        $this->cnpj = $cnpj;
+        $this->razaoSocial = $razaoSocial;
+        $this->itens = $itens;
+        $this->observacoes = $observacoes;
+        $this->dataEmissao = $dataEmissao;
+        $this->valorImpostos = $valorImpostos;
+    }
+
+    public function valor(): float
+    {
+        return 0;
+    }
+}
+```
+Perceba o quanto o construtor está grande e confuso.
