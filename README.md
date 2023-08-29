@@ -307,3 +307,88 @@ class VendaProduto extends Venda
     }
 }
 ```
+## Impostos e fábricas
+Criação da interface de fábrica de uma família de objetos relacionados a vendas:
+
+```php
+<?php
+
+namespace Alura\DesignPattern\Venda;
+
+use Alura\DesignPattern\Impostos\Imposto;
+
+interface VendaFactory
+{
+    public function criarVenda(): Venda;
+    public function imposto(): Imposto;
+}
+```
+Classe para fábrica de objetos relacionados a serviços:
+```php
+<?php
+
+namespace Alura\DesignPattern\Venda;
+
+use Alura\DesignPattern\Impostos\Iss;
+use Alura\DesignPattern\Impostos\Imposto;
+
+class VendaServicoFactory implements VendaFactory
+{
+    private string $nomePrestador;
+    
+    public function __construct(string $nomePrestador)
+    {
+        $this->nomePrestador = $nomePrestador;
+    }
+
+    public function criarVenda(): Venda {
+        return new VendaServico(new \DateTimeImmutable(), $this->nomePrestador);
+    }
+    
+    public function imposto(): Imposto {
+        return new Iss();
+    }
+}
+```
+Classe para fábrica de objetos relacionados a produtos:
+```php
+<?php
+
+namespace Alura\DesignPattern\Venda;
+
+use Alura\DesignPattern\Impostos\Icms;
+use Alura\DesignPattern\Impostos\Imposto;
+
+class VendaProdutoFactory implements VendaFactory
+{
+    private int $pesoProduto;
+    
+    public function __construct(int $pesoProduto)
+    {
+        $this->pesoProduto = $pesoProduto;
+    }
+
+    public function criarVenda(): Venda {
+        return new VendaProduto(new \DateTimeImmutable(), $this->pesoProduto);
+    }
+    
+    public function imposto(): Imposto {
+        return new Icms();
+    }
+}
+```
+Invocação das classes (arquivo `venda.php`):
+```php
+<?php
+
+use Alura\DesignPattern\Venda\{VendaProdutoFactory, VendaServicoFactory};
+
+require 'vendor/autoload.php';
+
+// $fabricaVenda = new VendaServicoFactory('Thiago');
+$fabricaVenda = new VendaProdutoFactory(500);
+$venda = $fabricaVenda->criarVenda();
+$imposto = $fabricaVenda->imposto();
+
+var_dump($venda, $imposto);
+```
