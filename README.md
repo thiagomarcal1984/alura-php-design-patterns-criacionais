@@ -438,3 +438,95 @@ class NotaFiscal
 }
 ```
 Perceba o quanto o construtor está grande e confuso.
+
+## Extraindo o construtor
+Removendo o construtor complexo da classe `NotaFiscal`:
+```php
+<?php
+
+namespace Alura\DesignPattern\NotaFiscal;
+
+class NotaFiscal
+{
+    public string $cnpj;
+    public string $razaoSocial;
+    public array $itens;
+    public string $observacoes;
+    public \DateTimeInterface $dataEmissao;
+    public float $valorImpostos;
+
+    public function valor(): float
+    {
+        return 0;
+    }
+}
+```
+Criando a classe `ConstrutorNotaFiscal`. Note que, com exceção do método `__construct` e `constroi`, todos os métodos retornam o próprio objeto da classe `ConstrutorNotaFiscal`. O nome disso é Fluid Interface: cada método do construtor de nota fiscal retorna um novo construtor de nota fiscal:
+```php
+<?php
+
+namespace Alura\DesignPattern\NotaFiscal;
+
+use Alura\DesignPattern\ItemOrcamento;
+
+class ConstrutorNotaFiscal
+{
+    private NotaFiscal $notaFiscal;
+
+    public function __construct()
+    {
+        $this->notaFiscal = new NotaFiscal();
+        $this->notaFiscal->dataEmissao = new \DateTimeImmutable();
+    }
+
+    public function paraEmpresa(string $cnpj, string $razaoSocial) : ConstrutorNotaFiscal
+    {
+        $this->notaFiscal->cnpj = $cnpj;
+        $this->notaFiscal->razaoSocial = $razaoSocial;
+        return $this;
+    }
+
+    public function comItem(ItemOrcamento $item) : ConstrutorNotaFiscal
+    {
+        $this->notaFiscal->itens[] = $item;
+        return $this;
+    }
+
+    public function comObservacoes(string $observacoes) : ConstrutorNotaFiscal
+    {
+        $this->notaFiscal->observacoes = $observacoes;
+        return $this;
+    }
+
+    public function comDataEmissao(\DateTimeInterface $dataEmissao) : ConstrutorNotaFiscal
+    {
+        $this->notaFiscal->dataEmissao = $dataEmissao;
+        return $this;
+    }
+
+    public function constroi() : NotaFiscal
+    {
+        return $this->notaFiscal;
+    }
+}
+```
+Invocação do construtor de notas fiscais no arquivo `nota-fiscal.php`:
+```php
+<?php
+
+use Alura\DesignPattern\ItemOrcamento;
+use Alura\DesignPattern\NotaFiscal\ConstrutorNotaFiscal;
+
+require 'vendor/autoload.php';
+
+// Fluent Interface: cada método do construtor de nota fiscal
+// retorna um novo construtor de nota fiscal.
+$notaFiscal = (new ConstrutorNotaFiscal())
+    ->paraEmpresa('12345', 'Balão Apagado SA')
+    ->comItem(new ItemOrcamento())
+    ->comItem(new ItemOrcamento())
+    ->comItem(new ItemOrcamento())
+    ->comObservacoes('Esta nota fiscal foi construída com um construtor')
+    ->constroi();
+```
+> A nota fiscal só é retornada de fato ao invocarmos o método `constroi`. Antes disso, apenas chamamos os métodos para compor a nota fiscal, de maneira mais encadeada e fluida.
