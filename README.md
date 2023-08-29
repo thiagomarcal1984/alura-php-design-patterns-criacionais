@@ -392,3 +392,7 @@ $imposto = $fabricaVenda->imposto();
 
 var_dump($venda, $imposto);
 ```
+## Falando sobre o padrão
+O exemplo das duas fábricas implementadas a partir da interface `VendaFactory` foca dois métodos: criar uma venda e um imposto. A classe usuário não precisa saber se a venda/imposto são de produto ou de serviço: só precisa usar o produto da fábrica abstrata para criar uma venda e um imposto de acordo com o seu tipo.
+
+Leitura complementar sobre o padrão Abstract Factory: https://refactoring.guru/design-patterns/abstract-factory
