@@ -530,3 +530,143 @@ $notaFiscal = (new ConstrutorNotaFiscal())
     ->constroi();
 ```
 > A nota fiscal só é retornada de fato ao invocarmos o método `constroi`. Antes disso, apenas chamamos os métodos para compor a nota fiscal, de maneira mais encadeada e fluida.
+
+## Impostos
+Transformando a classe `ConstrutorNotaFiscal` em uma classe abstrata:
+```php
+<?php
+
+namespace Alura\DesignPattern\NotaFiscal;
+
+use Alura\DesignPattern\ItemOrcamento;
+
+abstract class ConstrutorNotaFiscal
+{
+    protected NotaFiscal $notaFiscal;
+
+    public function __construct()
+    {
+        $this->notaFiscal = new NotaFiscal();
+        $this->notaFiscal->dataEmissao = new \DateTimeImmutable();
+    }
+
+    public function paraEmpresa(string $cnpj, string $razaoSocial) : ConstrutorNotaFiscal
+    {
+        $this->notaFiscal->cnpj = $cnpj;
+        $this->notaFiscal->razaoSocial = $razaoSocial;
+        return $this;
+    }
+
+    public function comItem(ItemOrcamento $item) : ConstrutorNotaFiscal
+    {
+        $this->notaFiscal->itens[] = $item;
+        return $this;
+    }
+
+    public function comObservacoes(string $observacoes) : ConstrutorNotaFiscal
+    {
+        $this->notaFiscal->observacoes = $observacoes;
+        return $this;
+    }
+
+    public function comDataEmissao(\DateTimeInterface $dataEmissao) : ConstrutorNotaFiscal
+    {
+        $this->notaFiscal->dataEmissao = $dataEmissao;
+        return $this;
+    }
+
+    abstract public function constroi() : NotaFiscal;
+}
+```
+Classe concreta `ConstrutorNotaFiscalServico`, com cálculo de 6% de imposto na nota:
+```php
+<?php
+
+namespace Alura\DesignPattern\NotaFiscal;
+
+class ConstrutorNotaFiscalServico extends ConstrutorNotaFiscal
+{
+    public function constroi() : NotaFiscal
+    {
+        $valorNotaFiscal = $this->notaFiscal->valor();
+        $this->notaFiscal->valorImpostos = $valorNotaFiscal * 0.06;
+        return $this->notaFiscal;
+    }
+}
+```
+
+Classe concreta `ConstrutorNotaFiscalProduto`, com cálculo de dois por cento de imposto na nota:
+```php
+<?php
+
+namespace Alura\DesignPattern\NotaFiscal;
+
+class ConstrutorNotaFiscalProduto extends ConstrutorNotaFiscal
+{
+    public function constroi() : NotaFiscal
+    {
+        $valorNotaFiscal = $this->notaFiscal->valor();
+        $this->notaFiscal->valorImpostos = $valorNotaFiscal * 0.02;
+        return $this->notaFiscal;
+    }
+}
+```
+Mudança na classe `NotaFiscal` para calcular o valor total da nota baseado na soma de cada item nela:
+```php
+<?php
+
+namespace Alura\DesignPattern\NotaFiscal;
+
+use Alura\DesignPattern\ItemOrcamento;
+
+class NotaFiscal
+{
+    public string $cnpj;
+    public string $razaoSocial;
+    public array $itens;
+    public string $observacoes;
+    public \DateTimeInterface $dataEmissao;
+    public float $valorImpostos;
+
+    public function valor(): float
+    {
+        // Lembre-se de atribuir o valor antes de invocar este método.
+        return array_reduce(
+            $this->itens, 
+            function(float $valorAcumulado, ItemOrcamento $item) { 
+                return $item->valor + $valorAcumulado;
+            },
+            0);
+    }
+}
+```
+
+Invocação dos builders concretos no arquivo `nota-fiscal.php`:
+```php
+<?php
+
+use Alura\DesignPattern\ItemOrcamento;
+use Alura\DesignPattern\NotaFiscal\{ConstrutorNotaFiscalProduto, ConstrutorNotaFiscalServico};
+
+require 'vendor/autoload.php';
+
+$item1 = new ItemOrcamento();
+$item1->valor = 500; // Se não houver inicialização, o cálculo do valor dos impostos falha.
+$item2 = new ItemOrcamento();
+$item2->valor = 1000; // Se não houver inicialização, o cálculo do valor dos impostos falha.
+$item3 = new ItemOrcamento();
+$item3->valor = 1500; // Se não houver inicialização, o cálculo do valor dos impostos falha.
+
+// Fluent Interface: cada método do construtor de nota fiscal
+// retorna um novo construtor de nota fiscal.
+$notaFiscal = (new ConstrutorNotaFiscalProduto())
+// $notaFiscal = (new ConstrutorNotaFiscalServico())
+    ->paraEmpresa('12345', 'Balão Apagado SA')
+    ->comItem($item1)
+    ->comItem($item2)
+    ->comItem($item3)
+    ->comObservacoes('Esta nota fiscal foi construída com um construtor')
+    ->constroi();
+
+echo $notaFiscal->valorImpostos;
+```
