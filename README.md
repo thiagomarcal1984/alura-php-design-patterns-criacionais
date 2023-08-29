@@ -1,7 +1,7 @@
 # Padrões criacionais (Gang of Four)
 
 - [x] Abstract Factory
-- [ ] Builder
+- [x] Builder
 - [x] Factory Method
 - [x] Flyweight (?Ele é estrutural, mas controla a criação de flyweights também.)
 - [ ] Prototype
@@ -670,3 +670,11 @@ $notaFiscal = (new ConstrutorNotaFiscalProduto())
 
 echo $notaFiscal->valorImpostos;
 ```
+
+## Falando sobre o padrão
+O padrão Builder serve para construir um objeto passo a passo. A classe do builder pode ter métodos abstratos que são redefinidos por cada builder concreto.
+
+Leitura complementar sobre o padrão Builder: 
+- https://refactoring.guru/design-patterns/builder
+- https://en.wikipedia.org/wiki/Fluent_interface
+- https://martinfowler.com/bliki/FluentInterface.html
