@@ -753,3 +753,101 @@ $notaFiscal2->itens[] = new ItemOrcamento();
 
 var_dump($notaFiscal2);
 ```
+## Clonando no PHP
+A palavra reservada `clone` é usada antes do objeto PHP que se deseja clonar. Com isso, o PHP instancia um novo objeto e copia cada valor primitivo e cada referência (não o valor) de cada propriedade do objeto clonado:
+```php
+$notaFiscal2 = clone $notaFiscal;
+var_dump($notaFiscal->dataEmissao)
+
+// Saída:
+/*
+object(DateTimeImmutable)#7 (3) {
+  ["date"]=>
+  string(26) "2023-08-31 19:40:54.632245"
+  ["timezone_type"]=>
+  int(3)
+  ["timezone"]=>
+  string(3) "UTC"
+}
+*/
+var_dump($notaFiscal2->dataEmissao)
+
+// Saída (note que o ID é o mesmo, #7 (3)):
+/*
+object(DateTimeImmutable)#7 (3) {
+  ["date"]=>
+  string(26) "2023-08-31 19:40:54.632245"
+  ["timezone_type"]=>
+  int(3)
+  ["timezone"]=>
+  string(3) "UTC"
+}
+*/
+```
+Se for necessário criar uma nova instância da data de emissão, você precisará reescrever o método mágico `__clone()`. Esse método  não pode ser chamado explicitamente: ele é chamado automaticamente após o uso da palavra reservada `clone`. O método mágico `__clone()` permite a exclusão do método `clonar()` que desenvolvemos na aula passada.
+
+Código alterado da classe `NotaFiscal`:
+```php
+<?php
+
+namespace Alura\DesignPattern\NotaFiscal;
+
+use Alura\DesignPattern\ItemOrcamento;
+
+class NotaFiscal
+{
+    public string $cnpj;
+    public string $razaoSocial;
+    public array $itens;
+    public string $observacoes;
+    public \DateTimeInterface $dataEmissao;
+    public float $valorImpostos;
+
+    public function valor(): float
+    {
+        // Lembre-se de atribuir o valor antes de invocar este método.
+        return array_reduce(
+            $this->itens, 
+            function(float $valorAcumulado, ItemOrcamento $item) { 
+                return $item->valor + $valorAcumulado;
+            },
+            0);
+    }
+
+    public function __clone()
+    {
+        $this->dataEmissao = new \DateTimeImmutable();
+    }
+}
+```
+> Repare que métodos mágicos sempre se iniciam com dois sublinhados `__`.
+
+Execução do mesmo script (arquivo `clone.php`):
+```php
+$notaFiscal2 = clone $notaFiscal;
+$notaFiscal2->itens[] = new ItemOrcamento();
+
+var_dump($notaFiscal->dataEmissao);
+/*
+object(DateTimeImmutable)#7 (3) {
+  ["date"]=>
+  string(26) "2023-08-31 19:47:21.230574"
+  ["timezone_type"]=>
+  int(3)
+  ["timezone"]=>
+  string(3) "UTC"
+}
+*/
+var_dump($notaFiscal2->dataEmissao);
+/*
+object(DateTimeImmutable)#8 (3) {
+  ["date"]=>
+  string(26) "2023-08-31 19:47:21.230639"
+  ["timezone_type"]=>
+  int(3)
+  ["timezone"]=>
+  string(3) "UTC"
+}
+*/
+```
+> Note que o id das datas está diferente agora (#7 e #8).

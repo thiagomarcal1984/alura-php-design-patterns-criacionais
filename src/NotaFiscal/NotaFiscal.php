@@ -35,4 +35,9 @@ class NotaFiscal
         $cloneNotaFiscal->valorImpostos = $this->valorImpostos;
         return $cloneNotaFiscal;
     }
+
+    public function __clone()
+    {
+        $this->dataEmissao = new \DateTimeImmutable();
+    }
 }

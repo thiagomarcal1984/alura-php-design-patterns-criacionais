@@ -22,7 +22,8 @@ $notaFiscal = (new ConstrutorNotaFiscalProduto())
     ->comObservacoes('Esta nota fiscal foi construída com um construtor')
     ->constroi();
 
-$notaFiscal2 = $notaFiscal->clonar();
+$notaFiscal2 = clone $notaFiscal;
 $notaFiscal2->itens[] = new ItemOrcamento();
 
-var_dump($notaFiscal2);
+var_dump($notaFiscal->dataEmissao);
+var_dump($notaFiscal2->dataEmissao);
