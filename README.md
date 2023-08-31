@@ -678,3 +678,78 @@ Leitura complementar sobre o padrão Builder:
 - https://refactoring.guru/design-patterns/builder
 - https://en.wikipedia.org/wiki/Fluent_interface
 - https://martinfowler.com/bliki/FluentInterface.html
+
+# Clonando objetos
+## Gerando uma cópia
+Inclusão do método `clonar()` no código da nota fiscal:
+```php
+<?php
+
+namespace Alura\DesignPattern\NotaFiscal;
+
+use Alura\DesignPattern\ItemOrcamento;
+
+class NotaFiscal
+{
+    public string $cnpj;
+    public string $razaoSocial;
+    public array $itens;
+    public string $observacoes;
+    public \DateTimeInterface $dataEmissao;
+    public float $valorImpostos;
+
+    public function valor(): float
+    {
+        // Lembre-se de atribuir o valor antes de invocar este método.
+        return array_reduce(
+            $this->itens, 
+            function(float $valorAcumulado, ItemOrcamento $item) { 
+                return $item->valor + $valorAcumulado;
+            },
+            0);
+    }
+
+    public function clonar() : NotaFiscal
+    {
+        $cloneNotaFiscal = new NotaFiscal();
+        $cloneNotaFiscal->cnpj = $this->cnpj;
+        $cloneNotaFiscal->razaoSocial = $this->razaoSocial;
+        $cloneNotaFiscal->itens = $this->itens;
+        $cloneNotaFiscal->observacoes = $this->observacoes;
+        $cloneNotaFiscal->dataEmissao = $this->dataEmissao;
+        $cloneNotaFiscal->valorImpostos = $this->valorImpostos;
+        return $cloneNotaFiscal;
+    }
+}
+```
+Script para testar a clonagem (arquivo `clone.php`):
+```php
+<?php
+
+use Alura\DesignPattern\ItemOrcamento;
+use Alura\DesignPattern\NotaFiscal\ConstrutorNotaFiscalProduto;
+use Alura\DesignPattern\NotaFiscal\ConstrutorNotaFiscalServico;
+
+require 'vendor/autoload.php';
+
+$item1 = new ItemOrcamento();
+$item1->valor = 500; // Se não houver inicialização, o cálculo do valor dos impostos falha.
+$item2 = new ItemOrcamento();
+$item2->valor = 1000; // Se não houver inicialização, o cálculo do valor dos impostos falha.
+$item3 = new ItemOrcamento();
+$item3->valor = 1500; // Se não houver inicialização, o cálculo do valor dos impostos falha.
+
+$notaFiscal = (new ConstrutorNotaFiscalProduto())
+// $notaFiscal = (new ConstrutorNotaFiscalServico())
+    ->paraEmpresa('12345', 'Balão Apagado SA')
+    ->comItem($item1)
+    ->comItem($item2)
+    ->comItem($item3)
+    ->comObservacoes('Esta nota fiscal foi construída com um construtor')
+    ->constroi();
+
+$notaFiscal2 = $notaFiscal->clonar();
+$notaFiscal2->itens[] = new ItemOrcamento();
+
+var_dump($notaFiscal2);
+```
