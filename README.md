@@ -5,7 +5,7 @@
 - [x] Factory Method
 - [x] Flyweight (?Ele é estrutural, mas controla a criação de flyweights também.)
 - [x] Prototype
-- [ ] Singleton
+- [x] Singleton
 
 Fonte: https://pt.wikipedia.org/wiki/Padr%C3%A3o_de_projeto_de_software
 
@@ -936,3 +936,10 @@ $pdo2 = PdoConnection::getInstance('sqlite::memory:'); // Obtendo o Singleton, s
 
 var_dump($pdo, $pdo2); // Agora as duas referências apontam para o mesmo objeto.
 ```
+## Falando sobre o padrão
+Problemas com o Singleton:
+1) Testes unitários em singletons são difíceis, por causa dos métodos estáticos.
+2) Por causa do construtor privado, a herança de Singletons fica mais difícil.
+3) O princípio da responsabilidade única é quebrado: Singletons representam o objeto e fabricam o objeto (duas responsabilidades).
+
+Leitura complementar sobre o padrão Singleton: https://refactoring.guru/design-patterns/singleton
