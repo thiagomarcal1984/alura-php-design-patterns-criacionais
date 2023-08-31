@@ -4,7 +4,7 @@
 - [x] Builder
 - [x] Factory Method
 - [x] Flyweight (?Ele é estrutural, mas controla a criação de flyweights também.)
-- [ ] Prototype
+- [x] Prototype
 - [ ] Singleton
 
 Fonte: https://pt.wikipedia.org/wiki/Padr%C3%A3o_de_projeto_de_software
@@ -858,3 +858,32 @@ A ideia do Prototype é copiar objetos existentes **sem que a classe usuária pr
 Leitura complementar:
 - Leitura complementar sobre o padrão Prototype: https://refactoring.guru/design-patterns/prototype
 - Documentação do PHP sobre clonagem: https://www.php.net/manual/en/language.oop5.cloning.php
+
+# Usando Singleton
+## Se conectando ao banco
+Problema: cada interação com o banco de dados exige a comunicação com um objeto da classe PDO. O problema é que acabamos correndo o risco de instanciar muitos objetos dessa classe, o que impacta no uso de memória.
+
+Exemplo de uma classe filha de PDO (`PdoConnection.php`):
+```php
+<?php
+
+namespace Alura\DesignPattern;
+
+class PdoConnection extends \PDO
+{
+}
+```
+Exemplo de código instanciando mais de um objeto PDO (`pdo.php`):
+```php
+<?php
+
+use Alura\DesignPattern\PdoConnection;
+
+require 'vendor/autoload.php';
+
+$pdo = new PdoConnection('sqlite::memory:');
+
+$pdo2 = new PdoConnection('sqlite::memory:'); // Repetição da instanciação.
+
+var_dump($pdo, $pdo2); // São dois objetos diferentes, com ids diferentes.
+```
