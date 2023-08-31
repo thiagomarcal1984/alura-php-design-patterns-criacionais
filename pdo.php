@@ -4,8 +4,8 @@ use Alura\DesignPattern\PdoConnection;
 
 require 'vendor/autoload.php';
 
-$pdo = new PdoConnection('sqlite::memory:');
+$pdo = PdoConnection::getInstance('sqlite::memory:');
 
-$pdo2 = new PdoConnection('sqlite::memory:'); // Repetição da instanciação.
+$pdo2 = PdoConnection::getInstance('sqlite::memory:'); // Obtendo o Singleton, sem recriá-lo.
 
-var_dump($pdo, $pdo2); // São dois objetos diferentes, com ids diferentes.
+var_dump($pdo, $pdo2); // Agora as duas referências apontam para o mesmo objeto.

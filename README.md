@@ -887,3 +887,52 @@ $pdo2 = new PdoConnection('sqlite::memory:'); // Repetição da instanciação.
 
 var_dump($pdo, $pdo2); // São dois objetos diferentes, com ids diferentes.
 ```
+## Única instância
+A solução é deixar o construtor do objeto privado e delegar para uma classe a criação e recuperação da instância única (Singleton).
+
+Adaptação da classe `PdoConnection`:
+```php
+<?php
+
+namespace Alura\DesignPattern;
+
+class PdoConnection extends \PDO
+{
+    private static ?self $instance = null;
+
+    private function __construct(
+        $dsn, 
+        $username = null, 
+        $password = null, 
+        $options = null
+    ) {
+        parent::__construct($dsn, $username, $password, $options);
+    }
+
+    public static function getInstance(
+        $dsn, 
+        $username = null, 
+        $password = null, 
+        $options = null
+    ) : self {
+        if (is_null(self::$instance)){
+            self::$instance = new static($dsn, $username, $password, $options);
+        }
+        return self::$instance;
+    }
+}
+```
+Criando e recuperando o Singleton no arquivo `pdo.php`:
+```php
+<?php
+
+use Alura\DesignPattern\PdoConnection;
+
+require 'vendor/autoload.php';
+
+$pdo = PdoConnection::getInstance('sqlite::memory:');
+
+$pdo2 = PdoConnection::getInstance('sqlite::memory:'); // Obtendo o Singleton, sem recriá-lo.
+
+var_dump($pdo, $pdo2); // Agora as duas referências apontam para o mesmo objeto.
+```
