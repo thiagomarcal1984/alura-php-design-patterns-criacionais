@@ -851,3 +851,10 @@ object(DateTimeImmutable)#8 (3) {
 */
 ```
 > Note que o id das datas está diferente agora (#7 e #8).
+
+## Falando sobre o padrão
+A ideia do Prototype é copiar objetos existentes **sem que a classe usuária precise depender dos métodos de acesso ao objeto**. O próprio objeto deve saber como se copiar. Isso diminui o acoplamento.
+
+Leitura complementar:
+- Leitura complementar sobre o padrão Prototype: https://refactoring.guru/design-patterns/prototype
+- Documentação do PHP sobre clonagem: https://www.php.net/manual/en/language.oop5.cloning.php
